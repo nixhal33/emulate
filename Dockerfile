@@ -1,20 +1,22 @@
-# Use an official Node.js runtime as a parent image
-FROM node:18-alpine
+FROM node:24-alpine
 
-# Set the working directory inside the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json (if available)
-COPY package*.json ./
+RUN npm install -g emulate@0.8.0
 
-# Install application dependencies
-RUN npm ci --only=production
-
-# Copy the rest of the application code
-COPY . .
-
-# Expose the port your app runs on (default for many Node.js apps is 3000)
 EXPOSE 4000
+EXPOSE 4001
+EXPOSE 4002
+EXPOSE 4003
+EXPOSE 4004
+EXPOSE 4005
+EXPOSE 4006
+EXPOSE 4007
+EXPOSE 4008
+EXPOSE 4009
+EXPOSE 4010
+EXPOSE 4011
+EXPOSE 4012
+EXPOSE 4013
 
-# Command to run your application
-CMD ["node", "server.js"]
+CMD ["emulate"]
