@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  # Main Application Service
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: emulate-app
+    restart: unless-stopped
+    ports:
+      - "4000:4000" # Main app port. Change left side if needed.
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      # Add all environment variables your app needs here
+      # Example for your services:
+      # - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      # - APPLE_CLIENT_ID=${APPLE_CLIENT_ID}
+      # - RESEND_API_KEY=${RESEND_API_KEY}
+      # - TWILIO_ACCOUNT_SID=${TWILIO_ACCOUNT_SID}
+      # - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+    networks:
+      - emulate-network
+
+  # --- Service 1: Google Emulator (Example) ---
+  google-emulator:
+    image: gcr.io/google.com/cloudsdktool/cloud-sdk:latest # Placeholder image
+    container_name: emulate-google
+    # In reality, you'd run a specific emulator command
+    command: ["gcloud", "beta", "emulators", "pubsub", "start", "--host-port=0.0.0.0:8085"]
+    ports:
+      - "4002:4002" # Google Pub/Sub emulator port
+    networks:
+      - emulate-network
+
+  # --- Service 2: Apple Emulator (Example) ---
+  # Apple doesn't provide an official emulator, so this is a mock service.
+  apple-mock:
+    image: node:18-alpine
+    container_name: emulate-apple
+    command: ["npx", "-y", "@stoplight/prism-cli", "mock", "-p", "8086", "https://raw.githubusercontent.com/stoplightio/stoplight-examples/main/specs/petstore.yaml"]
+    ports:
+      - "4004:4004" # Mock Apple API port
+    networks:
+      - emulate-network
+
+  # --- Service 3: Resend Emulator (Example) ---
+  # Create a mock SMTP/email service for Resend
+  resend-mock:
+    image: mailhog/mailhog:latest # A popular email testing tool
+    container_name: emulate-resend
+    ports:
+      - "8025:8025" # MailHog Web UI
+      - "4008:4008" # SMTP port
+    networks:
+      - emulate-network
+
+  # --- Service 4: Twilio Emulator (Example) ---
+  twilio-mock:
+    image: node:18-alpine
+    container_name: emulate-twilio
+    command: ["npx", "-y", "@twilio-labs/serverless-api", "mock", "--port", "8087"]
+    ports:
+      - "4013:4013" # Mock Twilio API port
+    networks:
+      - emulate-network
+
+  # --- Service 5: Stripe Emulator (Official) ---
+  stripe-mock:
+    image: stripe/stripe-mock:latest # Official Stripe mock server
+    container_name: emulate-stripe
+    ports:
+      - "4009:4009" # Stripe mock API port
+      - "12112:12112" # Stripe mock webhook port
+    networks:
+      - emulate-network
+
+networks:
+  emulate-network:
+    driver: bridge
